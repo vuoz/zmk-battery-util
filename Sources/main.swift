@@ -27,6 +27,7 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
         centralManager = CBCentralManager(delegate: self, queue: .main)
     }
     
+    // this only runs when the central manager's state changes ( + startup ) =>  i.e when bluetooth is turned on or off NOT when new devices are connected 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
             let peripherals = central.retrieveConnectedPeripherals(withServices: [batteryServiceUUID])
@@ -118,6 +119,56 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
         
     }
 }
+struct VisualEffectView: NSViewRepresentable {
+    var material: NSVisualEffectView.Material
+    var blendingMode: NSVisualEffectView.BlendingMode
+    
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = material
+        view.blendingMode = blendingMode
+        view.state = .active
+        return view
+    }
+    
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = material
+        nsView.blendingMode = blendingMode
+    }
+}
+
+struct HoverButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HoverButton(configuration: configuration)
+    }
+    
+    struct HoverButton: View {
+        let configuration: Configuration
+        @State private var isHovered = false
+        
+        var body: some View {
+            configuration.label
+            .padding(4)
+                .frame( minHeight: 20).frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    Group {
+                        if isHovered {
+                            VisualEffectView(material: .selection, blendingMode: .withinWindow)
+                        } else {
+                            Color.clear
+                        }
+                    }
+                )
+                .cornerRadius(4)
+                .onHover { hovering in
+                    withAnimation(.easeInOut(duration: 0.1)) {
+                        isHovered = hovering
+                    }
+                }
+        }
+    }
+}
+
 
 @main
 struct MenuBarHelloApp: App {
@@ -145,7 +196,7 @@ struct MenuBarHelloApp: App {
                                 Text(bluetoothManager.batteryInfo[peripheral.identifier]?.label ?? "N/A")
                                     .foregroundColor(.secondary)
                             }
-                        }.buttonStyle(PlainButtonStyle())
+                        }.buttonStyle(HoverButtonStyle())
 
                     }
                 }
@@ -156,10 +207,10 @@ struct MenuBarHelloApp: App {
                     print("Discovering / Update devices")
                     bluetoothManager.discoverNewDevices()
 
-                }.buttonStyle(PlainButtonStyle()).foregroundStyle(.primary)
+                }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
                 Button("Quit") {
                     NSApplication.shared.terminate(nil)
-                }.buttonStyle(PlainButtonStyle()).foregroundStyle(.primary)
+                }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
             }
             .padding()
             .onReceive(Timer.publish(every: 120, on:.main, in: .common).autoconnect()) {_ in 
