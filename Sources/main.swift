@@ -179,11 +179,11 @@ struct MenuBarHelloApp: App {
         MenuBarExtra {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Select your keyboard")
-                    .font(.headline)
+                    .font(.headline).padding(4)
                 Divider()
                 if bluetoothManager.connectedDevices.isEmpty {
                     Text("No devices found")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.secondary).padding(4)
                 } else {
                     ForEach(bluetoothManager.connectedDevices, id: \.identifier) { peripheral in
                         Button { 
@@ -201,7 +201,7 @@ struct MenuBarHelloApp: App {
                     }
                 }
                 Spacer()
-                Text("Actions").font(.headline)
+                Text("Actions").font(.headline).padding(4)
                 Divider()
                 Button("Discover / Update"){
                     print("Discovering / Update devices")
