@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreBluetooth
+import AppKit
 
 struct Reading{
     var level: UInt8
@@ -7,6 +8,10 @@ struct Reading{
 }
 struct BatterInfo {
     var levels: [Reading]
+    var label: String {
+        let joined = levels.makeIterator().map { "\(String($0.level))%"}.joined(separator: ", ");
+        return joined
+    }
 
 }
 class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate {
@@ -35,6 +40,22 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
             print("Bluetooth not available: \(central.state)")
         }
     }
+    // this discovers already connected devices with the battery service that have been connected since the app was launched
+    // and also updated the list of connected devices potentially removing any that are no longer connected
+    func discoverNewDevices(){
+        guard centralManager.state == .poweredOn else{
+            print("Bluetooth is not available")
+            return
+        }
+        let peripherals = centralManager.retrieveConnectedPeripherals(withServices: [batteryServiceUUID])
+        var connectedDevicesNew :[CBPeripheral] = []
+        for peripheral in  peripherals{
+            connectedDevicesNew.append(peripheral)
+            centralManager.connect(peripheral,options: nil)
+        }
+        connectedDevices =  connectedDevicesNew
+    }
+
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         peripheral.delegate = self
@@ -64,6 +85,8 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
         }
         guard let data = characteristic.value,
         let newReading = data.first else { return }
+
+        print("Packet received for peripheral \(peripheral.name ?? "Unknown") with value: \(data.first ?? 0)")
         if batteryInfo[peripheral.identifier] == nil {
             batteryInfo[peripheral.identifier] = BatterInfo(levels: [])
         }
@@ -77,7 +100,7 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
         var last_was_recent = false
         let info = batteryInfo[peripheral.identifier]!;
         for (i,reading) in info.levels.enumerated() {
-            if reading.ts + 200 > ts_curr{
+            if reading.ts + 150 > ts_curr{
                 last_was_recent = true
                 continue
             }else{
@@ -95,47 +118,72 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
         
     }
 }
-struct ContentView: View {
-    @StateObject var bluetoothManager = BluetoothManager()
-    
-    var body: some View {
-        VStack {
-            if bluetoothManager.connectedDevices.isEmpty {
-                Text("No connected devices with battery service found.")
-            } else {
-                List(bluetoothManager.connectedDevices, id: \.identifier) { peripheral in
-                    VStack(alignment: .leading) {
-                        Text(peripheral.name ?? "Unknown Device")
-                            .font(.headline)
-                        if let battery = bluetoothManager.batteryInfo[peripheral.identifier] {
-                            List{
-                                ForEach(battery.levels, id: \.ts) { reading in
-                                    Text("Battery Level: \(reading.level)%")
-                                        .foregroundColor(.blue)
-                                    
-                                }
-                            }
-                            
-                            
-                        } else {
-                            Text("Reading battery level...")
-                                .foregroundColor(.gray)
-                        }
-                    }
-                }
-            }
-        }
-        .frame(width: 300, height: 400)
-    }
-}
 
 @main
 struct MenuBarHelloApp: App {
+    @StateObject var bluetoothManager = BluetoothManager()
+    @State private var selectedPeripheral: CBPeripheral? = nil
+    
     var body: some Scene {
-        MenuBarExtra("Devices", systemImage: "battery.100") {
-            ContentView()
+        MenuBarExtra {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Select your keyboard")
+                    .font(.headline)
+                Divider()
+                if bluetoothManager.connectedDevices.isEmpty {
+                    Text("No devices found")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(bluetoothManager.connectedDevices, id: \.identifier) { peripheral in
+                        Button { 
+                            selectedPeripheral = peripheral
+                            print("\(peripheral.name ?? "Unknown") selected")
+                        } label: {
+                            HStack {
+                                Text(peripheral.name ?? "Unknown Device")
+                                Spacer()
+                                Text(bluetoothManager.batteryInfo[peripheral.identifier]?.label ?? "N/A")
+                                    .foregroundColor(.secondary)
+                            }
+                        }.buttonStyle(PlainButtonStyle())
+
+                    }
+                }
+                Spacer()
+                Text("Actions").font(.headline)
+                Divider()
+                Button("Discover / Update"){
+                    print("Discovering / Update devices")
+                    bluetoothManager.discoverNewDevices()
+
+                }.buttonStyle(PlainButtonStyle()).foregroundStyle(.primary)
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }.buttonStyle(PlainButtonStyle()).foregroundStyle(.primary)
+            }
+            .padding()
+            .onReceive(Timer.publish(every: 120, on:.main, in: .common).autoconnect()) {_ in 
+                print("Checking for new connected devices")
+                // every 120 seconds we check the device list for conected devices to update our state
+                bluetoothManager.discoverNewDevices()
+            }
+            .frame(minWidth:200, minHeight: 100,alignment: .topLeading)
+        } label: {
+            if let selected = selectedPeripheral,
+               let batteryLabel = bluetoothManager.batteryInfo[selected.identifier]?.label {
+                Text(" \(selected.name ?? "Name"): \(batteryLabel)")
+                    .font(.system(size: 10, weight: .bold))
+                    .frame(width: 30, height: 30)
+                    .background(Color.accentColor)
+                    .clipShape(Circle())
+            } else {
+                Text("Select your keyboard")
+                    .font(.system(size: 10, weight: .bold))
+                    .frame(width: 30, height: 30)
+                    .background(Color.accentColor)
+                    .clipShape(Circle())
+            }
         }
         .menuBarExtraStyle(.window)
     }
 }
-
