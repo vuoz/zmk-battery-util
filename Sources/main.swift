@@ -57,6 +57,10 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
     }
     connectedDevices = connectedDevicesNew
   }
+  func clearData(){
+      batteryInfo = [:]
+      self.discoverNewDevices()
+  }
 
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
     peripheral.delegate = self
@@ -214,6 +218,12 @@ struct MenuBarHelloApp: App {
           print("Discovering / Update devices")
           bluetoothManager.discoverNewDevices()
 
+        }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
+
+
+        Button("Clear / Refresh data"){
+          print("Clearing / refreshing data")
+          bluetoothManager.clearData()
         }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
         Button("Quit") {
           NSApplication.shared.terminate(nil)
