@@ -1,4 +1,4 @@
-G## Zmk Util
+## Zmk Util
 Makes battery levels of all parts (all splits) of you zmk split keyboard easily visible in the macOs menu bar
 ### Preview
 This is a screenshot of how the menu looks once enabled
