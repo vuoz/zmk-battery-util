@@ -15,7 +15,7 @@ This is a screenshot of how the menu looks once enabled
 
 ### Todos
 - [ ] Package the app
-- [ ] Add some more customization options ie. connnected devices refresh times
+- [ ] Add some more customization options eg. connnected devices refresh times
 
 
 
