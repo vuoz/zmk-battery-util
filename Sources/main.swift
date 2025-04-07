@@ -27,7 +27,7 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
     centralManager = CBCentralManager(delegate: self, queue: .main)
   }
 
-  // this only runs when the central manager's state changes ( + startup ) =>  i.e when bluetooth is turned on or off NOT when new devices are connected
+  // this only runs when the central manager's state changes ( + startup ) =>  eg. when bluetooth is turned on or off NOT when new devices are connected
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
     if central.state == .poweredOn {
       let peripherals = central.retrieveConnectedPeripherals(withServices: [batteryServiceUUID])
