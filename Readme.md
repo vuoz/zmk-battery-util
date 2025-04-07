@@ -7,7 +7,7 @@ This is a screenshot of how the menu looks once enabled
 ### Features
 - Show a list of connected devices / keyboards that report battery status
 - Select keyboard from said list, whose battery status will then be displayes in the menu battery
-- Reactive updates of battery status
+- Live updates of battery status in the menu bar
 - Refetch the list of connected devices (also done automatically every 120 seconds)
 - Clear the list of battery reports, if there were to be any issues
 
