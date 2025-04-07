@@ -18,6 +18,12 @@ This is a screenshot of how the menu looks once enabled
 - [ ] Add some more customization options eg. connnected devices refresh times
 
 
+### Run
+
+```shell
+swift run -c release
+```
+I will package this into an app in a the future
 
 ### Notes
 - this tools was put together in a few hours on the weekend ( with little swift experience ), if you find any issues or have suggestions please feel free to open an issue
