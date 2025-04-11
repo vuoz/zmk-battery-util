@@ -224,6 +224,11 @@ struct MenuBarHelloApp: App {
         Button("Clear / Refresh data"){
           print("Clearing / refreshing data")
           bluetoothManager.clearData()
+          // if the device list is empty after clearing, we also need to update the selected peripheral variable
+          // otherwise the text in the menu bar will not change
+          if bluetoothManager.connectedDevices.isEmpty{
+              selectedPeripheral = nil
+          }
         }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
         Button("Quit") {
           NSApplication.shared.terminate(nil)
