@@ -248,9 +248,14 @@ struct MenuBarHelloApp: App {
                 print("Checking for new connected devices")
                 // every 120 seconds we check the device list for conected devices to update our state
                 bluetoothManager.discoverNewDevices()
-                if bluetoothManager.connectedDevices.isEmpty {
+                // check if the currently selected device is still connected
+                if bluetoothManager.connectedDevices.isEmpty
+                    || (selectedPeripheral != nil
+                        && !bluetoothManager.connectedDevices.contains(selectedPeripheral!))
+                {
                     selectedPeripheral = nil
                 }
+
             }
             .frame(minWidth: 200, minHeight: 100, alignment: .topLeading)
         } label: {
