@@ -244,7 +244,7 @@ struct MenuBarHelloApp: App {
                 }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
             }
             .padding()
-            .onReceive(Timer.publish(every: 120, on: .main, in: .common).autoconnect()) { _ in
+            .onReceive(Timer.publish(every: 100, on: .main, in: .common).autoconnect()) { _ in
                 print("Checking for new connected devices")
                 // every 120 seconds we check the device list for conected devices to update our state
                 bluetoothManager.discoverNewDevices()
