@@ -44,7 +44,7 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
         }
     }
     // this discovers already connected devices with the battery service that have been connected since the app was launched
-    // and also updated the list of connected devices potentially removing any that are no longer connected
+    // and also updates the list of connected devices potentially removing any that are no longer connected
     func discoverNewDevices() {
         guard centralManager.state == .poweredOn else {
             print("Bluetooth is not available")
@@ -227,6 +227,12 @@ struct MenuBarHelloApp: App {
                 Button("Discover / Update") {
                     print("Discovering / Update devices")
                     bluetoothManager.discoverNewDevices()
+                    if bluetoothManager.connectedDevices.isEmpty
+                        || (selectedPeripheral != nil
+                            && !bluetoothManager.connectedDevices.contains(selectedPeripheral!))
+                    {
+                        selectedPeripheral = nil
+                    }
 
                 }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
 
@@ -235,7 +241,11 @@ struct MenuBarHelloApp: App {
                     bluetoothManager.clearData()
                     // if the device list is empty after clearing, we also need to update the selected peripheral variable
                     // otherwise the text in the menu bar will not change
-                    if bluetoothManager.connectedDevices.isEmpty {
+
+                    if bluetoothManager.connectedDevices.isEmpty
+                        || (selectedPeripheral != nil
+                            && !bluetoothManager.connectedDevices.contains(selectedPeripheral!))
+                    {
                         selectedPeripheral = nil
                     }
                 }.buttonStyle(HoverButtonStyle()).foregroundStyle(.primary)
