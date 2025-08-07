@@ -31,7 +31,7 @@ jobs:
       - name: Add Mint Packages to Path
         run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
       - name: Bootstrap via Mint
-        run: mint swift-bundler@main
+        run: mint install swift-bundler@main
       - name: Swift version 
         run: swift --version
       - run: echo "TOOLCHAINS=swift" >> $GITHUB_ENV
