@@ -10,10 +10,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: swift-actions/setup-swift@v2
+        with: 
+          swift-version: '6.1.0'
+
+      - name: Prepend Swift-6.1 toolchain to PATH
+        run: |
+          echo "/Users/runner/hostedtoolcache/swift-macOS/6.1/arm64/usr/bin" >> $GITHUB_PATH
       - name: Install Mint
         run: brew install mint
+      - name: Cache Mint Packages
+        uses: actions/cache@v4
+        with: 
+          path: |
+           ~/.mint
+           ~/.mint/bin
+          key: ${{runner.os}-mint-${{hashFiles("MintFile")}}}
+          restore-keys: |
+            ${{runner.os}}-mint-
+
       - name: Add Mint Packages to Path
         run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
+      - name: Bootstrap via Mint
+        run: mint bootstrap --path Mintfile
       - name: Install swift-bundler
         run: mint install stackotter/swift-bundler@main
       - name: Build Swift Package
