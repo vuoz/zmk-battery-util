@@ -39,4 +39,4 @@ jobs:
       - name: Swift version 
         run: swift --version
       - name: Bundle Swift Package
-        run: xcrun --toolchain swift swift-bundler bundle -c release -o . -u
+        run: swift-bundler bundle -c release -o . -u
