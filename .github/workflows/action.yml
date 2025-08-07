@@ -36,5 +36,7 @@ jobs:
         run: mint install stackotter/swift-bundler@main
       - name: Build Swift Package
         run: swift build -c release
+      - name: Swift version 
+        run: swift --version
       - name: Bundle Swift Package
         run: swift-bundler bundle -c release -o . -u
