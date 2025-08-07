@@ -24,9 +24,9 @@ jobs:
           path: |
            ~/.mint
            ~/.mint/bin
-          key: ${{runner.os}}-mint-${{hashFiles("Mintfile")}}
+          key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
           restore-keys: |
-            ${{runner.os}}-mint-
+            ${{ runner.os }}-mint-
 
       - name: Add Mint Packages to Path
         run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
