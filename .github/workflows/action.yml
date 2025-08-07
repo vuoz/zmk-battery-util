@@ -18,22 +18,26 @@ jobs:
           echo "/Users/runner/hostedtoolcache/swift-macOS/6.1/arm64/usr/bin" >> $GITHUB_PATH
       - name: Install Mint
         run: brew install mint
-      - name: Cache Mint Packages
-        uses: actions/cache@v4
-        with: 
+
+      - name: Cache Mint packages
+        uses: actions/cache@v3
+        with:
           path: |
-           ~/.mint
-           ~/.mint/bin
-          key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
-          restore-keys: |
-            ${{ runner.os }}-mint-
+            ${{ env.HOME }}/.mint
+          ${{ env.HOME }}/.mint/bin
+        key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
+        restore-keys: |
+          ${{ runner.os }}-mint-
 
       - name: Add Mint Packages to Path
         run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
       - name: Bootstrap via Mint
         run: mint bootstrap
       - name: Install swift-bundler
-        run: mint install stackotter/swift-bundler@main
+        run: mint boostrap
+
+      - name: Export Swift-6.1 compiler for SwiftPM
+        run: echo "SWIFT_EXEC=/Users/runner/hostedtoolcache/swift-macOS/6.1/arm64/usr/bin/swift" >> $GITHUB_ENV
       - name: Build Swift Package
         run: swift build -c release
       - name: Swift version 
