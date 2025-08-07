@@ -189,7 +189,7 @@ struct HoverButtonStyle: ButtonStyle {
 }
 
 @main
-struct MenuBarHelloApp: App {
+struct ZMKBatteryUtil: App {
     @StateObject var bluetoothManager = BluetoothManager()
     @State private var selectedPeripheral: CBPeripheral? = nil
 

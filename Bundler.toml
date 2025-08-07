@@ -1,0 +1,15 @@
+format_version = 2
+
+
+[apps.ZMKBatteryUtil]
+product = "ZMKBatteryUtil"
+
+version = "0.1.0"
+
+identifier = "com.vuoz.ZMKBatteryUtil"
+
+[apps.ZMKBatteryUtil.plist]
+
+CFBundleShortVersionString = "$(VERSION)_$(COMMIT_HASH)"
+NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to discover and monitor the battery status of ZMK based split keyboards"
+LSUIElement = true

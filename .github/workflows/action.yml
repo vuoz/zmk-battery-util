@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: swift-actions/setup-swift@v2
+      - name: Install Mint
+        run: brew install mint
+      - name: Add Mint Packages to Path
+        run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
+      - name: Install swift-bundler
+        run: mint install stackotter/swift-bundler@main
+      - name: Bundle Swift Package
+        run: swift-bundler bundle -c release -o . -u
