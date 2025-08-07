@@ -13,9 +13,9 @@ jobs:
         with: 
           swift-version: '6.1.0'
 
-      - name: Prepend Swift-6.1 toolchain to PATH
-        run: |
-          echo "/Users/runner/hostedtoolcache/swift-macOS/6.1/arm64/usr/bin" >> $GITHUB_PATH
+      - name: Export Swift version
+        run: echo "SWIFT_EXEC=${{ steps.swift.outputs.swift-path }}" >> $GITHUB_ENV
+
       - name: Install Mint
         run: brew install mint
 
@@ -24,7 +24,7 @@ jobs:
         with:
           path: |
             ${{ env.HOME }}/.mint
-          ${{ env.HOME }}/.mint/bin
+            ${{ env.HOME }}/.mint/bin
         key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
         restore-keys: |
           ${{ runner.os }}-mint-
@@ -36,8 +36,6 @@ jobs:
       - name: Install swift-bundler
         run: mint boostrap
 
-      - name: Export Swift-6.1 compiler for SwiftPM
-        run: echo "SWIFT_EXEC=/Users/runner/hostedtoolcache/swift-macOS/6.1/arm64/usr/bin/swift" >> $GITHUB_ENV
       - name: Build Swift Package
         run: swift build -c release
       - name: Swift version 
