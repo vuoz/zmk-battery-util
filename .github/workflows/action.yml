@@ -13,9 +13,6 @@ jobs:
         with: 
           swift-version: '6.1.0'
 
-      - name: Export Swift version
-        run: echo "SWIFT_EXEC=${{ steps.swift.outputs.swift-path }}" >> $GITHUB_ENV
-
       - name: Install Mint
         run: brew install mint
 
@@ -41,4 +38,4 @@ jobs:
       - name: Swift version 
         run: swift --version
       - name: Bundle Swift Package
-        run: swift-bundler bundle -c release -o . -u
+        run: xcrun --toolchain swift swift-bundler bundle -c release -o . -u
