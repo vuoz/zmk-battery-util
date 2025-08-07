@@ -16,5 +16,7 @@ jobs:
         run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
       - name: Install swift-bundler
         run: mint install stackotter/swift-bundler@main
+      - name: Build Swift Package
+        run: swift build -c release
       - name: Bundle Swift Package
         run: swift-bundler bundle -c release -o . -u
