@@ -24,7 +24,7 @@ jobs:
           path: |
            ~/.mint
            ~/.mint/bin
-          key: ${{runner.os}-mint-${{hashFiles("MintFile")}}}
+          key: ${{runner.os}}-mint-${{hashFiles("MintFile")}}
           restore-keys: |
             ${{runner.os}}-mint-
 
