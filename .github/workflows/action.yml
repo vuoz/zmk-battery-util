@@ -23,8 +23,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mint-
 
-
-
       - name: Mint cache test
         run : echo "cache-hit = ${{steps.cache-mint.outputs.cache-hit}}"
       - name: Install Mint
@@ -33,10 +31,9 @@ jobs:
       - name: Add Mint Packages to Path
         run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
       - name: Bootstrap via Mint
-        run: mint bootstrap
-      - name: Build Swift Package
-        run: swift build -c release
+        run: mint swift-bundler@main
       - name: Swift version 
         run: swift --version
+      - run: echo "TOOLCHAINS=swift" >> $GITHUB_ENV
       - name: Bundle Swift Package
         run: swift-bundler bundle -c release -o . -u
