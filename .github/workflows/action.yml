@@ -22,20 +22,7 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-
-      - name: Build
-        run: |
-          xcodebuild \
-          -project ZMKBatteryUtil.xcodeproj \
-          -scheme ZMKBatteryUtil \
-          -configuration Release \
-          -derivedDataPath build/DerivedData \
-          CODE_SIGNING_ALLOWED=NO \
-          CODE_SIGNING_REQUIRED=NO \
-          build
-
-
-      - name: Self Sign app
+      - name: Build and sign app
         env:
           SIGN_CERT_B64: ${{ secrets.SIGN_CERT_B64 }}
           CERT_PASS : ${{ secrets.CERT_PASS }}
@@ -53,9 +40,19 @@ jobs:
             security import $CERTIFICATE_P12_PATH -P "$CERT_PASS" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           
             IDENTITY=$(security find-identity -v -p codesigning $KEYCHAIN_PATH | head -n 1 | grep -o '".*"' | sed 's/"//g')
+
             echo "Signing with identity: $IDENTITY"
 
-            codesign --force --deep --sign "$IDENTITY" --keychain $KEYCHAIN_PATH "$APP_PATH"
+            xcodebuild \
+              -project ZMKBatteryUtil.xcodeproj \
+              -scheme ZMKBatteryUtil \
+              -configuration Release \
+              -derivedDataPath build/DerivedData \
+              CODE_SIGNING_ALLOWED=YES \
+              CODE_SIGNING_REQUIRED=YES \
+              CODE_SIGN_IDENTITY="$IDENTITY" \
+              build
+
             security delete-keychain $KEYCHAIN_PATH
             rm -f $CERTIFICATE_P12_PATH
 
