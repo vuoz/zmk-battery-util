@@ -33,6 +33,33 @@ jobs:
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGNING_REQUIRED=NO \
           build
+
+
+      - name: Self Sign app
+        if: ${{ secrets.SIGN_CERT_B64 != '' && secrets.CERT_PASS!= '' }}
+        env:
+          SIGN_CERT_B64: ${{ secrets.SIGN_CERT_B64 }}
+          CERT_PASS : ${{ secrets.CERT_PASS }}
+        run: |
+            KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+            CERTIFICATE_P12_PATH=$RUNNER_TEMP/certificate.p12
+            APP_PATH="build/DerivedData/Build/Products/Release/ZMKBatteryUtil.app"
+
+            echo -n "$SIGN_CERT_B64" | base64 --decode -o $CERTIFICATE_P12_PATH
+
+            security create-keychain -p "$CERT_PASS" $KEYCHAIN_PATH
+            security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+            security unlock-keychain -p "$CERT_PASS" $KEYCHAIN_PATH
+
+            security import $CERTIFICATE_P12_PATH -P "$CERT_PASS" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          
+            IDENTITY=$(security find-identity -v -p codesigning $KEYCHAIN_PATH | head -n 1 | grep -o '".*"' | sed 's/"//g')
+            echo "Signing with identity: $IDENTITY"
+
+            codesign --force --deep --sign "$IDENTITY" --keychain $KEYCHAIN_PATH "$APP_PATH"
+            security delete-keychain $KEYCHAIN_PATH
+            rm -f $CERTIFICATE_P12_PATH
+
       - name: Install create-dmg
         run: brew install create-dmg
       - name: Create DMG

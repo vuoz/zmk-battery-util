@@ -1,6 +1,5 @@
 name: ZMKBatteryUtil          
 options:
-  bundleIdPrefix: com.vuoz
   deploymentTarget:
     macOS: "14.0"
 targets:
@@ -20,6 +19,7 @@ targets:
         CFBundleVersion: 0.1.0
         LSUIElement: true
         NSBluetoothAlwaysUsageDescription: "This app requires Bluetooth to discover and monitor the battery status of ZMK devices."
+        NSBluetoothPeripheralUsageDescription: "Used to read battery levels from your BLE devices."
 
     settings:
       base:

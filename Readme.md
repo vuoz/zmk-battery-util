@@ -22,6 +22,25 @@ This is a screenshot of how the menu looks once enabled
 1. Go to this repo's release page and download the latest version
 2. Double clicke the downloaded bundle and drag it to you application folder
 
+
+### Building the app bundle from source for testing
+1. run xcodegen
+```bash
+xcodegen
+```
+2. Build the app with xcodebuild
+```bash
+xcodebuild \
+  -project ZMKBatteryUtil.xcodeproj \
+  -scheme ZMKBatteryUtil \
+  -configuration Release \
+  -derivedDataPath build/DerivedData \
+  CODE_SIGNING_ALLOWED=NO \
+  CODE_SIGNING_REQUIRED=NO \
+  build
+```
+3. Locate the .app bundle at "build/DerivedData/Build/Products/Release/ZMKBatteryUtil.app"
+
 ### Notes
 - this tools was put together in a few hours on the weekend ( with little swift experience ), if you find any issues or have suggestions please feel free to open an issue
 
