@@ -46,15 +46,25 @@ jobs:
 
 
       - name: Create Release
+        id: create_release
         uses: actions/create-release@v1
         with: 
-          files: dist/ZMKBatteryUtil.dmg
           tag_name: ZMKBatteryUtil-${{github.sha}}
           release_name: ZMKBatteryUtil-Release-${{github.sha}}
           body: |
             Release of ZMKBatteryUtil
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload DMG 
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}  
+          asset_path: dist/ZMKBatteryUtil.dmg
+          asset_name: ZMKBatteryUtil.dmg
+          asset_content_type: applicationk/x-apple-diskimage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
