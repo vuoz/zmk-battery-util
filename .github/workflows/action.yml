@@ -9,31 +9,56 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: swift-actions/setup-swift@v2
-        with: 
-          swift-version: '6.1.0'
-      - name: Cache Mint packages
-        id: cache-mint
-        uses: actions/cache@v3
+      - uses: xavierLowmiller/xcodegen-action@1.2.4
         with:
-          path: |
-            ${{ env.HOME }}/.mint
-            ${{ env.HOME }}/.mint/bin
-          key: ${{ runner.os }}-mint-${{ hashFiles('Mintfile') }}
-          restore-keys: |
-            ${{ runner.os }}-mint-
+          spec: project.yaml
+          quiet: true
+          version: '2.15.1'
+      - name: Generate Xcode project
+        run: xcodegen generate
 
-      - name: Mint cache test
-        run : echo "cache-hit = ${{steps.cache-mint.outputs.cache-hit}}"
-      - name: Install Mint
-        run: brew install mint
 
-      - name: Add Mint Packages to Path
-        run: echo "$HOME/.mint/bin" >> $GITHUB_PATH
-      - name: Bootstrap via Mint
-        run: mint install swift-bundler@main
-      - name: Swift version 
-        run: swift --version
-      - run: echo "TOOLCHAINS=swift" >> $GITHUB_ENV
-      - name: Bundle Swift Package
-        run: swift-bundler bundle -c release -o . -u
+      - name: Build
+        run: |
+          xcodebuild \                                    
+          -project ZMKBatteryUtil.xcodeproj \
+          -scheme ZMKBatteryUtil \
+          -configuration Release \
+          -derivedDataPath build/DerivedData \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGNING_REQUIRED=NO \
+          build
+      - name: Install create-dmg
+        run: brew install create-dmg
+      - name: Create DMG
+        run: |
+          APP_DIR="build/DerivedData/Build/Products/Release"
+          APP_NAME="ZMKBatteryUtil.app"         
+          VOL_NAME="ZMKBatteryUtil"            
+
+          rm -rf dist dmgroot
+          mkdir -p dist dmgroot
+          cp -R "$APP_DIR/$APP_NAME" dmgroot/
+
+          create-dmg --volname "ZMKBatteryUtil" --window-size 600 400 --app-drop-link 450 200 dist/ZMKBatteryUtil.dmg "dmgroot"
+
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with: 
+          files: dist/ZMKBatteryUtil.dmg
+          tag_name: ZMKBatteryUtil-${{github.sha}}
+          release_name: ZMKBatteryUtil-Release-${{github.sha}}
+          body: |
+            Release of ZMKBatteryUtil
+          draft: false
+          prerelease: false
+
+
+
+
+
+
+
+
+

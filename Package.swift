@@ -15,7 +15,6 @@ let package = Package(
             name: "ZMKBatteryUtil", path: "Sources/ZMKBatteryUtil",
             linkerSettings: [
                 .linkedFramework("AppKit"), .linkedFramework("CoreBluetooth"),
-                .linkedFramework("SwiftUI"),
             ])
     ],
 

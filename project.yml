@@ -1,0 +1,38 @@
+name: ZMKBatteryUtil          
+options:
+  bundleIdPrefix: com.vuoz
+  deploymentTarget:
+    macOS: "14.0"
+targets:
+  ZMKBatteryUtil:               
+    type: application
+    platform: macOS
+    sources: 
+      - path: Sources/ZMKBatteryUtil
+    info: 
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: ZMKBatteryUtil
+        CFBundleExecutable: ZMKBatteryUtil
+        CFBundleIdentifier: com.vouz.ZMKBatteryUtil
+        CFBundleName: ZMKBatteryUtil
+        CFBundleShortVersionString: 0.1.0
+        CFBundleVersion: 0.1.0
+        LSUIElement: true
+        NSBluetoothAlwaysUsageDescription: "This app requires Bluetooth to discover and monitor the battery status of ZMK devices."
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vouz.ZMKBatteryUtil
+        CODE_SIGN_IDENTITY: ""
+        SWIFT_VERSION: 6.0
+        CODE_SIGNING_REQUIRED: NO
+        PRODUCT_NAME: ZMKBatteryUtil
+        PRODUCT_MODULE_NAME: ZMKBatteryUtil
+        SWIFT_MODULE_NAME: ZMKBatteryUtil
+        DEFINES_MODULE: YES
+        CLANG_ENABLE_MODULES: YES
+
+schemes:
+  ZMKBatteryUtil: { build: { targets: { ZMKBatteryUtil: all } } }
+
