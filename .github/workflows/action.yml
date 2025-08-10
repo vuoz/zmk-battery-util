@@ -30,6 +30,10 @@ jobs:
             KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
             CERTIFICATE_P12_PATH=$RUNNER_TEMP/certificate.p12
             APP_PATH="build/DerivedData/Build/Products/Release/ZMKBatteryUtil.app"
+            if [ -z "$SIGN_CERT_B64" ] || [ -z "$CERT_PASS" ]; then
+              echo "One of the required secrets is not set"
+              exit 1
+            fi
 
             echo -n "$SIGN_CERT_B64" | base64 --decode -o $CERTIFICATE_P12_PATH
 
