@@ -36,7 +36,6 @@ jobs:
 
 
       - name: Self Sign app
-        if: ${{ secrets.SIGN_CERT_B64 != '' && secrets.CERT_PASS != '' }}
         env:
           SIGN_CERT_B64: ${{ secrets.SIGN_CERT_B64 }}
           CERT_PASS : ${{ secrets.CERT_PASS }}
